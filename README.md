@@ -1,6 +1,6 @@
 # azure-functions-runner
 
-###How to run
+### How to run
 
 ```
 npm install
