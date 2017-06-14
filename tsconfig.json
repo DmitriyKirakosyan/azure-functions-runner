@@ -1,0 +1,20 @@
+{
+    "version": "1.0.1-alpha",
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "declaration": true,
+        "noImplicitAny": false,
+        "removeComments": true,
+        "noLib": false,
+        "preserveConstEnums": true,
+        "suppressImplicitAnyIndexErrors": true,
+        "typeRoots": [
+            "./node_modules/@types"
+        ],
+        "outDir": "../js"
+    },
+    "files": [
+        "./ts/*.ts"
+    ]
+}

@@ -1,0 +1,6 @@
+node_modules
+bin
+docs
+docdb-sdk
+AzureFunctions/BackendAzureFunction/scripts
+AzureFunctions/packages
