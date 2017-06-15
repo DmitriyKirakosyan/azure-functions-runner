@@ -6,6 +6,9 @@ import * as childProcess from "child_process"
 import { AzureFunction, Context } from './AzureFunction';
 import { AFBuilder } from './AFBuilder';
 
+import { config } from 'dotenv';
+config();
+
 /**
  * Represent the runner of azure functions
  */
