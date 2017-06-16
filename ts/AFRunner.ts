@@ -9,6 +9,8 @@ import { AFBuilder } from './AFBuilder';
 import { config } from 'dotenv';
 config();
 
+const LOG_LEVELS = ["error", "silly", "debug", "verbose", "info", "warn"];
+
 /**
  * Represent the runner of azure functions
  */
@@ -16,6 +18,7 @@ export class AFRunner {
 
     private port: number;
     private builder: AFBuilder;
+    private logLvl: string;
 
     constructor(rootDir: string) {
         if (!rootDir) {
@@ -30,11 +33,17 @@ export class AFRunner {
         this.port = port;
     }
 
+    set setLogLevel(logLevel: string) {
+        this.logLvl = logLevel;
+    }
+
     public start(): void {
         let app: express.Application = express();
         app.use(cors());
         app.use(bodyParser.json());
         app.use(bodyParser.urlencoded({ extended: false }));
+        this.addLogLevel(app, this.logLvl);
+
         let server = app.listen(this.port, () => console.log('Functions app listen a port ' + this.port + '.'));
         let azureFuntions: AzureFunction[] = this.builder.build();
         if (!azureFuntions || azureFuntions.length === 0) {
@@ -45,7 +54,7 @@ export class AFRunner {
 
         azureFuntions.forEach((af: AzureFunction) => {
             if (af.getBindings.isDisabled) {
-                console.log("Function: " + af.getName + "(DISABLED)");
+                console.log('\x1b[33m%s\x1b[0m', "Function: " + af.getName + "(DISABLED)");
                 return;
             }
 
@@ -85,6 +94,29 @@ export class AFRunner {
             console.log('\x1b[32m%s\x1b[0m',
                 'Function: http://localhost:' + this.port + '/api/' + this.builder.generateUrl(af.getBindings.getBindingIn.getRoute) + "(" + method.toUpperCase() + ")");
         });
+    }
+
+    private addLogLevel(app: express.Application, logLevel: string): void {
+        if (!logLevel || !LOG_LEVELS.indexOf(logLevel.toLocaleLowerCase())) {
+            return;
+        }
+
+        let winston = require("winston");
+        let expressWinston = require("express-winston");
+        let morgan = require("morgan");
+        app.use(morgan('combine'));
+        app.use(expressWinston.logger({
+            transports: [
+                new winston.transports.Console({
+                    json: true,
+                    colorize: true,
+                    level: logLevel
+                })
+            ],
+            level: logLevel,
+            requestWhitelist: ['body'],
+            responseWhitelist: ['body']
+        }));
     }
 
     private installPackages(packageJsonPath: string): Promise<any> {
