@@ -104,7 +104,7 @@ export class AFRunner {
         let winston = require("winston");
         let expressWinston = require("express-winston");
         let morgan = require("morgan");
-        app.use(morgan('combine'));
+        app.use(morgan('combined'));
         app.use(expressWinston.logger({
             transports: [
                 new winston.transports.Console({
@@ -113,9 +113,9 @@ export class AFRunner {
                     level: logLevel
                 })
             ],
-            level: logLevel,
-            requestWhitelist: ['body'],
-            responseWhitelist: ['body']
+            level: 'silly',
+            requestWhitelist: ['body', 'headers'],
+            responseWhitelist: ['body', 'headers']
         }));
     }
 
